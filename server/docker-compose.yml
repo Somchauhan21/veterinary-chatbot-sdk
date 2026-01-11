@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: vetchat-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: vetchat
+
+  api:
+    build: .
+    container_name: vetchat-api
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongodb:27017/vetchat
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+      - CORS_ORIGINS=*
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
